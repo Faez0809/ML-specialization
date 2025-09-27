@@ -64,3 +64,9 @@ The more practice (data/examples) a learning algorithm has, the **better it perf
 - Arthur Samuel’s checkers program showed the **power of self-learning**.  
 - Two main ML types: **Supervised** and **Unsupervised**.  
 - The course focuses on both algorithms **and** real-world best practices.  
+
+
+---
+<div style="margin-top:200px;"></div>
+
+---
