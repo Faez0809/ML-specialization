@@ -544,32 +544,349 @@ A contour plot is a **top-down view** of the bowl.
 
 ## 5) Intuition: Mount Fuji 🌋
 
-Think of $J(W,B)$ like the height on a mountain.
+Think of J(W,B) like the height on a mountain.
 
 - Height = cost  
-- Walking **downhill** = changing $W,B$ to reduce cost  
-- The **lowest valley** = best parameters $\left(W^*, B^*\right)$
+- Walking **downhill** = changing W, B to reduce cost  
+- The **lowest valley** = best parameters: `W*`, `B*`
 
 ![Mount Fuji Analogy](./images/Mount%20Fuji.png)
 
 ---
 
-## 6) Why BOTH $W$ and $B$ matter
+## 6) Why BOTH W and B matter
 
-- $W$ tilts the line (slope)  
-- $B$ shifts the line up/down (intercept)
+- `W` tilts the line (slope)  
+- `B` shifts the line up/down (intercept)
 
-Fixing only one can miss the best fit. The **minimum** of $J(W,B)$ usually needs **both** adjusted.
+Fixing only one can miss the best fit. The minimum of `J(W,B)` usually needs both adjusted.
 
 ---
 
 ## ✅ Summary
 
-- Model: $f(x)=W x + B$  
-- Cost: $J(W,B)=\dfrac{1}{2m}\sum (f(x^{(i)})-y^{(i)})^2$  
+- Model: `f(x) = W * x + B`
+- Cost: `J(W,B) = (1/(2m)) * sum (f(x^(i)) - y^(i))^2`
 - 3D surface (bowl) + 2D contour view describe the **same** function  
-- The **lowest point** of the bowl = best $W,B$ (smallest error)
+- The **lowest point** of the bowl = best parameters: `W`, `B` (smallest error)
 
 ---
+
+
+# 📘 Lecture 14 – Understanding Cost Function with Different Parameter Choices
+
+This lecture builds intuition about how **parameters ($W$ and $B$)** affect:
+
+* The fitted line $f(x)$
+* The **cost function $J(W, B)$**
+* The relationship between **good/bad fits** and their positions on the **contour plot** and **3D surface plot**
+
+---
+
+## I. Visualizing Parameter Choices and Corresponding Cost
+
+We use two main plots side by side:
+
+* **Left (Model Plot):** Training data (red crosses) with the fitted line $f(x)$.
+* **Right (Contour Plot):** Cost function $J(W, B)$ visualized as ovals (ellipses).
+  * Each ellipse = points with the same cost value.
+  * Center = minimum cost (best fit).
+* **Bottom (3D Surface Plot):** The same cost function, but in 3D.
+
+---
+
+### 🔴 Example 1: A Poor Fit (High Cost)
+
+* **Chosen Parameters:** $W = -0.15$, $B = 800$
+* **Equation:** $f(x) = -0.15x + 800$
+  * Negative slope, intercept at 800.
+* **Observation:** The line goes **downward** while housing prices actually **go upward** → very poor fit.
+* **Cost $J$:** Large, point lies **far from the minimum** on contour plot.
+
+![](./images/-0.15.png)  
+
+---
+
+### 🟠 Example 2: Slightly Better, But Still Not Good
+
+* **Chosen Parameters:** $W = 0$, $B = 360$
+* **Equation:** $f(x) = 0 \times x + 360$ (flat line).
+* **Observation:** Predicts the **same price for every house**, regardless of size.  
+  Slightly less bad than Example 1, but still poor.
+* **Cost $J$:** Closer to the center compared to Example 1, but still far.
+
+![](./images/0x.png)  
+
+---
+
+### 🟡 Example 3: Wrong Direction (Far from Minimum)
+
+* **Chosen Parameters:** $W = -0.15$, $B = 500$
+* **Equation:** $f(x) = -0.15x + 500$
+* **Observation:** Line still slopes downward when data trends upward → wrong direction.
+* **Cost $J$:** Point is again **far away from the center** (high cost).
+
+![](./images/1500.png)  
+
+---
+
+### 🟢 Example 4: A Good Fit (Low Cost)
+
+* **Chosen Parameters:** $W = 0.13$, $B = 71$
+* **Equation:** $f(x) = 0.13x + 71$
+* **Observation:** Line follows the upward trend well.
+* **Errors:** Vertical distances between predictions and true prices are **small**.
+* **Cost $J$:** Point is **very close to the center ellipse** → near minimum.
+
+![](./images/71.png)  
+
+---
+
+## II. Intuition from the Examples
+
+* **Different $(W, B)$ choices → different straight lines $f(x)$.**
+* Each line results in a **different cost $J(W, B)$**.
+* **Good fits (low error) → points close to the minimum on contour plot.**
+* **Bad fits (high error) → points far away from the minimum.**
+
+👉 The contour and surface plots are powerful tools to **visualize how parameter changes affect model quality**.
+
+
+
+
+## III. Moving Beyond Manual Selection
+
+* Manually picking parameters by eye **is not practical** for real models.
+* In bigger ML problems (with many parameters), this becomes **impossible**.
+* We need an **algorithm** to automatically find the minimum of $J(W, B)$.
+
+---
+
+## IV. Next Step: Gradient Descent 🚀
+
+* The next lecture introduces **Gradient Descent**, one of the **most important optimization algorithms in machine learning**.
+* Gradient Descent efficiently finds the best values of $W$ and $B$ that **minimize $J(W, B)$**.
+* It is used not only in linear regression but also in training **deep learning models**.
+
+---
+
+# ✅ Summary
+
+* **Contour plots** show cost function in 2D (ellipses).
+* **3D surface plots** show cost in 3D (bowl shape).
+* **Better fits → points near the center (minimum $J$).**
+* **Worse fits → points farther from the center.**
+* Next step: learn how Gradient Descent finds these optimal parameters automatically.
+
+# 📘 Lecture 15 – Gradient Descent (Introduction & Intuition)
+
+Gradient Descent is one of the **most important algorithms in machine learning**.  
+It is used to find the best parameters ($W, B$) that **minimize the cost function $J(W, B)$**.
+
+---
+
+## I. Why Do We Need Gradient Descent?
+
+- In earlier lectures, we learned about the **cost function $J(W, B)$**.
+- Manually checking every possible value of $W$ and $B$ is **not practical**.
+- We need a **systematic way** to reach the lowest value of $J(W, B)$.
+- 👉 That systematic method is **Gradient Descent**.
+
+---
+
+## II. What Gradient Descent Is Used For
+
+- Gradient Descent minimizes **any function**, not just the squared error cost function.
+- It is widely used to:
+  - Train **linear regression models**
+  - Train **neural networks** (deep learning models)
+  - Optimize many other machine learning algorithms
+- Works even when there are **many parameters** ($W_1, W_2, ..., W_n, B$).
+
+---
+
+## III. How Gradient Descent Works (Analogy)
+
+Think of $J(W, B)$ as a **landscape of hills and valleys**:
+
+- **High point = large error (bad fit)**  
+- **Low point = small error (good fit)**
+
+Gradient Descent is like **standing on a hill** and trying to walk downhill:
+
+1. **Initialization**  
+   - Start with some guess for $W, B$ (e.g., $W=0$, $B=0$).
+
+2. **Look Around (Find Steepest Descent)**  
+   - Spin around and find the **direction downhill that decreases $J$ the fastest**.  
+   - This direction is given by the **gradient** (hence the name).
+
+3. **Take a Small Step**  
+   - Move a little in that direction.  
+   - Now you are at a lower point on the hill.
+
+4. **Repeat**  
+   - Keep repeating until you reach the **bottom of the valley** → the **minimum cost**.
+
+![](./images/gradient.png)  
+
+---
+
+## IV. Local Minima (Important Note)
+
+- Some functions may have **multiple valleys** → called **local minima**.
+- Where gradient descent ends up **depends on the starting point**.
+  - If you start on one hill, you will end up in that valley only.
+- ⚠️ For **linear regression with squared error**, $J(W, B)$ is a **convex bowl shape** →  
+  ✅ Only **one minimum** (no risk of local minima).
+
+
+
+---
+
+## V. Summary
+
+- Gradient Descent = an algorithm to **find parameters that minimize cost $J$**.  
+- Works by:
+  - Starting at an initial guess
+  - Taking small steps in the direction of steepest descent
+  - Repeating until reaching the bottom
+- Used everywhere in machine learning:
+  - Linear regression
+  - Logistic regression
+  - Deep learning
+
+👉 The next lecture will explain the **mathematics** behind Gradient Descent.
+
+---
+
+# 📘 Lecture 16 – Gradient Descent Algorithm (Implementation)
+
+This note turns the intuition from earlier lectures into the **actual update rules** for gradient descent.  
+It explains the role of the **learning rate**, the **derivative**, and the **must-do simultaneous update** of the parameters.
+
+---
+
+## 1) Goal
+
+Given a cost function \(J(W,B)\), we want to **minimize** it by updating the parameters:
+
+$$
+\min_{W,B}\; J(W,B)
+$$
+
+---
+## 2) Core Update Rules
+
+On each step, change \(W\) and \(B\) in the direction that **reduces** \(J\):
+
+$$
+W := W - \alpha \,\frac{\partial J(W,B)}{\partial W}
+\qquad
+B := B - \alpha \,\frac{\partial J(W,B)}{\partial B}
+$$
+
+- \(\alpha\) = **learning rate** (step size, a small positive number like 0.1, 0.01, 0.001).  
+- \(\frac{\partial J}{\partial W}\), \(\frac{\partial J}{\partial B}\) = **derivatives** (slopes) of the cost with respect to each parameter.
+
+![](./images/grad.png)
+
+
+---
+
+## 3) What the Terms Mean (in simple words)
+
+- **Learning rate \(\alpha\)**  
+  - Big \(\alpha\) → big steps (can overshoot and diverge).  
+  - Small \(\alpha\) → tiny steps (stable but slow).  
+  - Start with a modest value and adjust if needed.
+
+- **Derivative / Gradient**  
+  - Tells **which way is downhill** and **how steep it is**.  
+  - Large magnitude → steeper hill → bigger change to the parameter.
+
+- **Repeat until convergence**  
+  - Keep updating until \(J\) **stops decreasing much** (or a max number of steps is reached).
+
+
+---
+
+## 4) Simultaneous Update (critical detail)
+
+You must compute both new values **from the old ones** before assigning:
+
+### ✅ Correct (simultaneous)
+```text
+tmp_w = W - α * (∂J/∂W evaluated at old W,B)
+tmp_b = B - α * (∂J/∂B evaluated at old W,B)
+
+W = tmp_w
+B = tmp_b
+```
+
+### ❌ Incorrect (sequential, mixes new W with old B)
+```text
+tmp_w = W - α * (∂J/∂W at old W,B)
+W = tmp_w
+tmp_b = B - α * (∂J/∂B at NEW W, old B)  # <-- wrong for standard GD
+B = tmp_b
+```
+
+
+---
+
+## 5) Minimal Pseudocode
+
+```python
+# inputs: cost J(W, B), grad functions dJ_dW(W,B), dJ_dB(W,B)
+W, B = W_init, B_init           # often 0.0, 0.0
+alpha = 0.01                    # learning rate
+for step in range(max_steps):
+    gW = dJ_dW(W, B)            # gradient w.r.t W
+    gB = dJ_dB(W, B)            # gradient w.r.t B
+    new_W = W - alpha * gW      # compute both using OLD W,B
+    new_B = B - alpha * gB
+    W, B = new_W, new_B         # assign simultaneously
+    # optional: stop early if |J changes| is tiny
+```
+
+---
+
+## 6) Coding vs. Math: the equals sign
+
+- In **code**, `=` means **assign** (store the right-hand value into the left variable).  
+  Example: `A = A + 1` increments `A`.  
+- In **math**, `=` means a **true statement** (so \(A = A + 1\) is never true).  
+- Equality check in code: `==`.
+
+
+
+---
+
+## 7) Practical Tips
+
+- Start with a small $ \alpha $; if $ J $ **oscillates or grows**, reduce $ \alpha $.  
+- Track $ J $ every few steps; it should **go down**.  
+- Keep the **simultaneous update**—it’s easy to get wrong.  
+- For linear regression with squared error, $ J $ is a **convex bowl** → one global minimum (no local-minima worries).
+
+
+---
+
+## 8) Summary
+
+- Update rules:
+  $$
+  W := W - \alpha \,\frac{\partial J}{\partial W},\qquad
+  B := B - \alpha \,\frac{\partial J}{\partial B}
+  $$
+- \( $ \alpha $) controls **how far** you step; the gradient controls **where** and **how strongly** to step.  
+- **Simultaneous updates** of \(W\) and \(B\) are required.  
+- Repeat until \(J\) stops decreasing → parameters have **converged**.
+
+
+---
+
+
 
 
