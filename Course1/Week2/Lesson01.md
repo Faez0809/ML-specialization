@@ -1,4 +1,4 @@
-# 📘 Multiple Linear Regression – Detailed Notes
+# 📘 Lec21 Multiple Linear Regression 
 
 This lecture explains **Multiple Linear Regression**, which allows us to use **multiple features (inputs)** to make better predictions compared to using only one feature.  
 It also introduces **notations** 📑 and a **compact vectorized form** ⚡.
